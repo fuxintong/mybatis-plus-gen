@@ -1,0 +1,30 @@
+package ${packageName}.domain;
+
+import lombok.Data;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.IdType;
+
+/**
+ * ${functionName}对象 ${tableName}
+ * 
+ * @author fuxintong
+ * @date 2026-04-16 10:10:54
+ */
+@Data
+@TableName("${tableName}")
+public class ${ClassName}
+{
+    private static final long serialVersionUID = 1L;
+
+#foreach ($column in $columns)
+#if($column.isPk)
+    /** $column.columnComment */
+    @TableId(type = IdType.AUTO)
+    private ${column.javaType} ${column.javaField};
+#else
+    /** $column.columnComment */
+    private ${column.javaType} ${column.javaField};
+#end
+#end
+}
