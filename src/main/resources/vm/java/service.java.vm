@@ -1,0 +1,49 @@
+package ${packageName}.service;
+
+import java.util.List;
+import ${packageName}.domain.${ClassName};
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
+/**
+ * ${functionName}Service接口
+ * 
+ * @author fuxintong
+ * @date 2026-04-16 10:13:31
+ */
+public interface I${ClassName}Service
+{
+    /**
+     * 分页查询${functionName}列表
+     */
+    public Page<${ClassName}> select${ClassName}Page(Integer pageNum, Integer pageSize, ${ClassName} ${className});
+
+    /**
+     * 查询${functionName}
+     */
+    public ${ClassName} select${ClassName}ById(${pkColumn.javaType} ${pkColumn.javaField});
+
+    /**
+     * 查询${functionName}列表
+     */
+    public List<${ClassName}> select${ClassName}List(${ClassName} ${className});
+
+    /**
+     * 新增${functionName}
+     */
+    public int insert${ClassName}(${ClassName} ${className});
+
+    /**
+     * 修改${functionName}
+     */
+    public int update${ClassName}(${ClassName} ${className});
+
+    /**
+     * 删除${functionName}
+     */
+    public int delete${ClassName}ByIds(${pkColumn.javaType}[] ${pkColumn.javaField}s);
+
+    /**
+     * 删除${functionName}
+     */
+    public int delete${ClassName}ById(${pkColumn.javaType} ${pkColumn.javaField});
+}
