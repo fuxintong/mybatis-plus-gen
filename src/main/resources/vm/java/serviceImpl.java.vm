@@ -1,0 +1,70 @@
+package ${packageName}.service.impl;
+
+import java.util.List;
+import org.springframework.stereotype.Service;
+import ${packageName}.mapper.${ClassName}Mapper;
+import ${packageName}.domain.${ClassName};
+import ${packageName}.service.I${ClassName}Service;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+
+/**
+ * ${functionName}Service业务层处理
+ * 
+ * @author ${author}
+ * @date 2026-04-16 10:13:34
+ */
+@Service
+public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${ClassName}> implements I${ClassName}Service
+{
+    /**
+     * 分页查询${functionName}列表
+     */
+    @Override
+    public Page<${ClassName}> select${ClassName}Page(Integer pageNum, Integer pageSize, ${ClassName} ${className})
+    {
+        Page<${ClassName}> page = new Page<>(pageNum, pageSize);
+        LambdaQueryWrapper<${ClassName}> queryWrapper = new LambdaQueryWrapper<>();
+        // 根据需要添加查询条件
+        return baseMapper.selectPage(page, queryWrapper);
+    }
+
+    @Override
+    public ${ClassName} select${ClassName}ById(${pkColumn.javaType} ${pkColumn.javaField})
+    {
+        return baseMapper.selectById(${pkColumn.javaField});
+    }
+
+    @Override
+    public List<${ClassName}> select${ClassName}List(${ClassName} ${className})
+    {
+        LambdaQueryWrapper<${ClassName}> queryWrapper = new LambdaQueryWrapper<>();
+        // 根据需要添加查询条件
+        return baseMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public int insert${ClassName}(${ClassName} ${className})
+    {
+        return baseMapper.insert(${className});
+    }
+
+    @Override
+    public int update${ClassName}(${ClassName} ${className})
+    {
+        return baseMapper.updateById(${className});
+    }
+
+    @Override
+    public int delete${ClassName}ById(${pkColumn.javaType} ${pkColumn.javaField})
+    {
+        return baseMapper.deleteById(${pkColumn.javaField});
+    }
+
+    @Override
+    public int delete${ClassName}ByIds(${pkColumn.javaType}[] ${pkColumn.javaField}s)
+    {
+        return baseMapper.deleteBatchIds(java.util.Arrays.asList(${pkColumn.javaField}s));
+    }
+}
