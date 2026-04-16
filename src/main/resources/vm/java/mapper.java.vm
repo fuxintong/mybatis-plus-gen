@@ -1,0 +1,15 @@
+package ${packageName}.mapper;
+
+import ${packageName}.domain.${ClassName};
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+/**
+ * ${functionName}Mapper接口
+ * 
+ * @author ${author}
+ * @date 2026-04-16 10:11:59
+ */
+public interface ${ClassName}Mapper extends BaseMapper<${ClassName}>
+{
+    // MyBatis-Plus 已提供 CRUD 方法，不需要重复定义
+}
