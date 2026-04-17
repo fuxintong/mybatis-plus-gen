@@ -80,7 +80,7 @@ public class ${ClassName}Controller extends BaseController
     }
 
     /**
-     * 导入${functionName}列表
+     * 导入${functionName}列表（批量插入）
      */
     @ApiOperation("导入${functionName}列表")
     @Log(title = "${functionName}", businessType = BusinessType.IMPORT)
@@ -91,7 +91,7 @@ public class ${ClassName}Controller extends BaseController
     {
         ExcelUtil<${ClassName}> util = new ExcelUtil<${ClassName}>(${ClassName}.class);
         List<${ClassName}> list = util.importExcel(file.getInputStream());
-        String message = importData(list);
+        String message = importBatch(list);
         return AjaxResult.success(message);
     }
 
@@ -107,39 +107,46 @@ public class ${ClassName}Controller extends BaseController
     }
 
     /**
-     * 导入数据
+     * 批量导入数据
+     * 使用 MyBatis-Plus 的 saveBatch 方法进行批量插入，性能更优
      */
-    protected String importData(List<${ClassName}> list)
+    protected String importBatch(List<${ClassName}> list)
     {
         if (list == null || list.isEmpty()) {
             return "导入数据为空";
         }
         
+        int totalNum = list.size();
         int successNum = 0;
         int failureNum = 0;
-        StringBuilder successMsg = new StringBuilder();
         StringBuilder failureMsg = new StringBuilder();
 
-        for (${ClassName} ${className} : list) {
+        // 分批处理，每批 1000 条
+        int batchSize = 1000;
+        for (int i = 0; i < list.size(); i += batchSize) {
+            int end = Math.min(i + batchSize, list.size());
+            List<${ClassName}> batchList = list.subList(i, end);
+            
             try {
-                ${className}Service.insert${ClassName}(${className});
-                successNum++;
+                // 使用 MyBatis-Plus 的 saveBatch 方法批量插入
+                ${className}Service.saveBatch(batchList);
+                successNum += batchList.size();
             } catch (Exception e) {
-                failureNum++;
-                failureMsg.append("<br/>");
-                failureMsg.append(failureNum + "、${functionName} 导入失败：");
+                failureNum += batchList.size();
+                failureMsg.append("第 ");
+                failureMsg.append(i / batchSize + 1);
+                failureMsg.append(" 批数据导入失败：");
                 failureMsg.append(e.getMessage());
+                failureMsg.append("<br/>");
             }
         }
 
         if (failureNum > 0) {
-            failureMsg.insert(0, "很抱歉，导入失败！共 " + failureNum + " 条数据格式不正确，错误如下：");
+            failureMsg.insert(0, "导入完成！共 " + totalNum + " 条数据，成功 " + successNum + " 条，失败 " + failureNum + " 条。<br/>失败信息：<br/>");
             throw new RuntimeException(failureMsg.toString());
         } else {
-            successMsg = new StringBuilder("恭喜你，数据已全部导入成功！共 " + successNum + " 条数据");
+            return "恭喜你，数据已全部导入成功！共 " + successNum + " 条数据";
         }
-
-        return successMsg.toString();
     }
 
     /**
