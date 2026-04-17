@@ -7,8 +7,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * ${functionName}Service接口
  * 
- * @author fuxintong
- * @date 2026-04-16 10:13:31
+ * @author ${author}
+ * @date ${datetime}
  */
 public interface I${ClassName}Service
 {
@@ -46,4 +46,14 @@ public interface I${ClassName}Service
      * 删除${functionName}
      */
     public int delete${ClassName}ById(${pkColumn.javaType} ${pkColumn.javaField});
+
+    /**
+     * 批量新增${functionName}
+     */
+    public boolean saveBatch(List<${ClassName}> list);
+
+    /**
+     * 批量新增${functionName}（指定批大小）
+     */
+    public boolean saveBatch(List<${ClassName}> list, int batchSize);
 }
