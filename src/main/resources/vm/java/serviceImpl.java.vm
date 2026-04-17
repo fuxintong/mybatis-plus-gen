@@ -13,7 +13,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
  * ${functionName}Service业务层处理
  * 
  * @author ${author}
- * @date 2026-04-16 10:13:34
+ * @date ${datetime}
  */
 @Service
 public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${ClassName}> implements I${ClassName}Service
@@ -66,5 +66,25 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
     public int delete${ClassName}ByIds(${pkColumn.javaType}[] ${pkColumn.javaField}s)
     {
         return baseMapper.deleteBatchIds(java.util.Arrays.asList(${pkColumn.javaField}s));
+    }
+
+    /**
+     * 批量新增${functionName}
+     * 继承自 ServiceImpl 的 saveBatch 方法
+     */
+    @Override
+    public boolean saveBatch(List<${ClassName}> list)
+    {
+        return super.saveBatch(list);
+    }
+
+    /**
+     * 批量新增${functionName}（指定批大小）
+     * 继承自 ServiceImpl 的 saveBatch 方法
+     */
+    @Override
+    public boolean saveBatch(List<${ClassName}> list, int batchSize)
+    {
+        return super.saveBatch(list, batchSize);
     }
 }
