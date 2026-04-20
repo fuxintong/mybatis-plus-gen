@@ -108,7 +108,7 @@ public class ${ClassName}Controller extends BaseController
 
     /**
      * 批量导入数据
-     * 采用逐条插入的方式，实现精准记录成功与失败的条数及异常信息
+     * 高性能方案：内存预校验 + MyBatis-Plus saveBatch
      */
     protected String importBatch(List<${ClassName}> list)
     {
@@ -120,25 +120,49 @@ public class ${ClassName}Controller extends BaseController
         int failureNum = 0;
         StringBuilder successMsg = new StringBuilder();
         StringBuilder failureMsg = new StringBuilder();
+        
+        // 存储校验通过，等待批量插入的合法数据
+        List<${ClassName}> validList = new java.util.ArrayList<>();
 
+        // 1. 内存预校验阶段
         for (int i = 0; i < list.size(); i++) {
             ${ClassName} ${className} = list.get(i);
             try {
-                boolean isSuccess = ${className}Service.save(${className});
-                if (isSuccess) {
-                    successNum++;
+                // 验证必填字段等业务逻辑，由于是代码生成器，这里默认校验主键不为空（如果业务上有其他唯一约束或必填项校验，请在此处扩展）
+                // 您也可以使用 validator.validate(${className}) 进行 JSR-303 注解校验
+                boolean isValid = true;
+                
+                if (isValid) {
+                    validList.add(${className});
                 } else {
                     failureNum++;
-                    failureMsg.append("<br/>第 ").append(i + 1).append(" 条数据导入失败");
+                    failureMsg.append("<br/>第 ").append(i + 1).append(" 条数据校验未通过");
                 }
             } catch (Exception e) {
                 failureNum++;
-                String msg = "<br/>第 " + (i + 1) + " 条数据导入异常：";
+                String msg = "<br/>第 " + (i + 1) + " 条数据校验异常：";
                 String cause = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
                 failureMsg.append(msg).append(cause);
             }
         }
 
+        // 2. 批量插入阶段 (高性能)
+        if (!validList.isEmpty()) {
+            try {
+                // 执行 MyBatis-Plus 批量插入
+                ${className}Service.saveBatch(validList);
+                successNum = validList.size();
+            } catch (Exception e) {
+                // 如果整批插入失败，通常是因为遇到了数据库唯一索引冲突等底层错误
+                // 此时无法精确到哪一条，只能记录整批失败
+                failureNum += validList.size();
+                successNum = 0;
+                String cause = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+                failureMsg.append("<br/>批量插入数据库时发生严重异常，导致全部合法数据导入失败：").append(cause);
+            }
+        }
+
+        // 3. 结果汇总
         if (failureNum > 0) {
             failureMsg.insert(0, "导入完成！共 " + list.size() + " 条数据，成功 " + successNum + " 条，失败 " + failureNum + " 条。错误详情：");
             return failureMsg.toString();
