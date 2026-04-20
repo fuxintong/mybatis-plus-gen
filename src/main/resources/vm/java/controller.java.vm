@@ -108,7 +108,7 @@ public class ${ClassName}Controller extends BaseController
 
     /**
      * 批量导入数据
-     * 使用 MyBatis-Plus 的 saveBatch 方法进行批量插入，性能更优
+     * 采用逐条插入的方式，实现精准记录成功与失败的条数及异常信息
      */
     protected String importBatch(List<${ClassName}> list)
     {
@@ -116,36 +116,35 @@ public class ${ClassName}Controller extends BaseController
             return "导入数据为空";
         }
         
-        int totalNum = list.size();
         int successNum = 0;
         int failureNum = 0;
+        StringBuilder successMsg = new StringBuilder();
         StringBuilder failureMsg = new StringBuilder();
 
-        // 分批处理，每批 1000 条
-        int batchSize = 1000;
-        for (int i = 0; i < list.size(); i += batchSize) {
-            int end = Math.min(i + batchSize, list.size());
-            List<${ClassName}> batchList = list.subList(i, end);
-            
+        for (int i = 0; i < list.size(); i++) {
+            ${ClassName} ${className} = list.get(i);
             try {
-                // 使用 MyBatis-Plus 的 saveBatch 方法批量插入
-                ${className}Service.saveBatch(batchList);
-                successNum += batchList.size();
+                boolean isSuccess = ${className}Service.save(${className});
+                if (isSuccess) {
+                    successNum++;
+                } else {
+                    failureNum++;
+                    failureMsg.append("<br/>第 ").append(i + 1).append(" 条数据导入失败");
+                }
             } catch (Exception e) {
-                failureNum += batchList.size();
-                failureMsg.append("第 ");
-                failureMsg.append(i / batchSize + 1);
-                failureMsg.append(" 批数据导入失败：");
-                failureMsg.append(e.getMessage());
-                failureMsg.append("<br/>");
+                failureNum++;
+                String msg = "<br/>第 " + (i + 1) + " 条数据导入异常：";
+                String cause = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+                failureMsg.append(msg).append(cause);
             }
         }
 
         if (failureNum > 0) {
-            failureMsg.insert(0, "导入完成！共 " + totalNum + " 条数据，成功 " + successNum + " 条，失败 " + failureNum + " 条。<br/>失败信息：<br/>");
-            throw new RuntimeException(failureMsg.toString());
+            failureMsg.insert(0, "导入完成！共 " + list.size() + " 条数据，成功 " + successNum + " 条，失败 " + failureNum + " 条。错误详情：");
+            return failureMsg.toString();
         } else {
-            return "恭喜你，数据已全部导入成功！共 " + successNum + " 条数据";
+            successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + successNum + " 条数据。");
+            return successMsg.toString();
         }
     }
 
